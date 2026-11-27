@@ -1,0 +1,11 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Profiles are readable by any signed-in user. Only Cloud Functions (Admin SDK) write them.
+    match /users/{uid} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+  }
+}

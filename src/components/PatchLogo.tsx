@@ -1,0 +1,46 @@
+type PatchLogoProps = {
+  size?: number;
+};
+
+const PatchLogo: React.FC<PatchLogoProps> = ({ size = 110 }) => (
+  <svg width={size} height={size} viewBox="80 -26 840 840" role="img" aria-label="Pitch Perfect logo">
+    <circle cx="500" cy="394" r="404" fill="#F1EAD5" />
+    <circle cx="500" cy="394" r="398" fill="none" stroke="#2E6B40" strokeWidth="28" />
+    <circle
+      cx="500"
+      cy="394"
+      r="350"
+      fill="none"
+      stroke="#2E6B40"
+      strokeWidth="5"
+      strokeLinecap="round"
+      strokeDasharray="22 10 4 10"
+    />
+    <rect x="366" y="258" width="20" height="30" fill="#2A5A36" />
+    <polygon points="370,145 335,215 355,215 320,252 420,252 385,215 405,215" fill="#2A5A36" />
+    <rect x="302" y="262" width="410" height="220" rx="50" fill="#2E6B40" />
+    <rect x="355" y="312" width="90" height="65" rx="10" fill="#F1EAD5" />
+    <rect x="485" y="312" width="88" height="65" rx="10" fill="#F1EAD5" />
+    <rect x="302" y="405" width="410" height="26" fill="#E0782C" />
+    <line x1="305" y1="410" x2="228" y2="366" stroke="#2A2A24" strokeWidth="22" strokeLinecap="round" />
+    <circle cx="226" cy="366" r="14" fill="#2A2A24" />
+    <circle cx="420" cy="500" r="48" fill="#3A3530" />
+    <circle cx="420" cy="500" r="20" fill="#6B635A" />
+    <circle cx="580" cy="502" r="48" fill="#3A3530" />
+    <circle cx="580" cy="502" r="20" fill="#6B635A" />
+    <path d="M728 470 C742 490 750 502 746 516 C744 524 712 524 710 516 C706 502 716 492 728 470 Z" fill="#E8772E" />
+    <path d="M728 500 C734 508 738 512 735 520 C732 524 722 524 721 518 C720 512 724 508 728 500 Z" fill="#F5C04A" />
+    <line x1="698" y1="530" x2="758" y2="518" stroke="#3A3530" strokeWidth="7" strokeLinecap="round" />
+    <line x1="698" y1="518" x2="758" y2="530" stroke="#3A3530" strokeWidth="7" strokeLinecap="round" />
+    <rect x="260" y="546" width="505" height="8" rx="3" fill="#2E6B40" />
+    <rect x="260" y="560" width="505" height="6" rx="3" fill="#2E6B40" />
+    <rect x="312" y="586" width="175" height="7" rx="3" fill="#2E6B40" />
+    <rect x="548" y="586" width="159" height="7" rx="3" fill="#2E6B40" />
+    <circle cx="520" cy="590" r="4" fill="#2E6B40" />
+    <rect x="407" y="617" width="193" height="7" rx="3" fill="#2E6B40" />
+    <circle cx="380" cy="620" r="4" fill="#2E6B40" />
+    <circle cx="622" cy="620" r="4" fill="#2E6B40" />
+  </svg>
+);
+
+export default PatchLogo;

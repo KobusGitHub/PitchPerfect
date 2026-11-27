@@ -1,0 +1,85 @@
+apply plugin: 'com.android.application'
+
+// Reads APP_VERSION_* from the environment's env file (repo root), so the version is set in one place per environment.
+def envValue(String envFile, String key) {
+    def line = file("${rootProject.projectDir.parentFile}/${envFile}").readLines().find { it.startsWith("${key}=") }
+    if (line == null) throw new GradleException("${key} is missing from ${envFile}")
+    return line.substring(key.length() + 1).trim()
+}
+
+android {
+    namespace = "net.crazysoftware.pitchperfect"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "net.crazysoftware.pitchperfect"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    flavorDimensions "environment"
+    productFlavors {
+        prod {
+            dimension "environment"
+            versionCode Integer.parseInt(envValue('.env.production', 'APP_VERSION_CODE'))
+            versionName envValue('.env.production', 'APP_VERSION_NAME')
+            resValue "string", "app_name", "Pitch Perfect"
+            resValue "string", "title_activity_main", "Pitch Perfect"
+        }
+        qa {
+            dimension "environment"
+            versionCode Integer.parseInt(envValue('.env.qa', 'APP_VERSION_CODE'))
+            versionName envValue('.env.qa', 'APP_VERSION_NAME')
+            applicationIdSuffix ".qa"
+            resValue "string", "app_name", "Pitch Perfect QA"
+            resValue "string", "title_activity_main", "Pitch Perfect QA"
+        }
+        dev {
+            dimension "environment"
+            versionCode Integer.parseInt(envValue('.env.development', 'APP_VERSION_CODE'))
+            versionName envValue('.env.development', 'APP_VERSION_NAME')
+            applicationIdSuffix ".dev"
+            resValue "string", "app_name", "Pitch Perfect DEV"
+            resValue "string", "title_activity_main", "Pitch Perfect DEV"
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}
