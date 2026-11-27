@@ -7,6 +7,7 @@ import { useAuth } from './auth/useAuth';
 import SideMenu, { MAIN_CONTENT_ID } from './components/SideMenu';
 import Home from './pages/Home';
 import SignIn from './pages/SignIn';
+import Stands from './pages/Stands';
 import Users from './pages/Users';
 import { useIsAdmin } from './users/useIsAdmin';
 
@@ -66,6 +67,14 @@ const App: React.FC = () => (
             element={
               <RequireAuth>
                 <Home />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/campsites/:siteId/stands"
+            element={
+              <RequireAuth>
+                <Stands />
               </RequireAuth>
             }
           />

@@ -18,6 +18,7 @@ import {
   IonTitle,
   IonToast,
   IonToolbar,
+  useIonRouter,
 } from '@ionic/react';
 import { add, checkmarkCircle, closeCircle } from 'ionicons/icons';
 import { useState } from 'react';
@@ -38,6 +39,7 @@ const messageOf = (error: unknown): string =>
 
 const Home: React.FC = () => {
   const { user } = useAuth();
+  const router = useIonRouter();
   const ownerUid = user?.uid;
   const { sites, loading, error: loadError } = useCampSites(ownerUid);
   const [selected, setSelected] = useState<CampSite | null>(null);
@@ -165,6 +167,7 @@ const Home: React.FC = () => {
           onDidDismiss={(e) => {
             setActionOpen(false);
             const action = (e.detail.data as { action?: string } | undefined)?.action;
+            if (action === 'stands' && selected) router.push(`/campsites/${selected.id}/stands`);
             if (action === 'edit') {
               setFormSite(selected ?? undefined);
               setFormOpen(true);
@@ -172,6 +175,7 @@ const Home: React.FC = () => {
             if (action === 'delete') setDeleteOpen(true);
           }}
           buttons={[
+            { text: 'Stands', data: { action: 'stands' } },
             { text: 'Edit', data: { action: 'edit' } },
             { text: 'Delete', role: 'destructive', data: { action: 'delete' } },
             { text: 'Cancel', role: 'cancel' },

@@ -1,14 +1,11 @@
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
 
-const MAX_SIDE_PX = 256;
-const JPEG_QUALITY = 0.8;
-
-export const resizeToDataUrl = (dataUrl: string): Promise<string> =>
+export const resizeToDataUrl = (dataUrl: string, maxSidePx: number, quality: number): Promise<string> =>
   new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => {
-      const scale = Math.min(1, MAX_SIDE_PX / Math.max(image.width, image.height));
+      const scale = Math.min(1, maxSidePx / Math.max(image.width, image.height));
       const canvas = document.createElement('canvas');
       canvas.width = Math.round(image.width * scale);
       canvas.height = Math.round(image.height * scale);
@@ -21,7 +18,7 @@ export const resizeToDataUrl = (dataUrl: string): Promise<string> =>
       context.fillStyle = '#ffffff';
       context.fillRect(0, 0, canvas.width, canvas.height);
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
-      resolve(canvas.toDataURL('image/jpeg', JPEG_QUALITY));
+      resolve(canvas.toDataURL('image/jpeg', quality));
     };
     image.onerror = () => reject(new Error('Could not read that image.'));
     image.src = dataUrl;
@@ -59,13 +56,15 @@ const pickOnDevice = async (): Promise<string | null> => {
   return photo.dataUrl ?? null;
 };
 
-export const pickCampSiteLogo = async (): Promise<string | null> => {
+export const pickImage = async (maxSidePx: number, quality: number): Promise<string | null> => {
   try {
     const dataUrl = Capacitor.getPlatform() === 'web' ? await pickFileOnWeb() : await pickOnDevice();
-    return dataUrl ? await resizeToDataUrl(dataUrl) : null;
+    return dataUrl ? await resizeToDataUrl(dataUrl, maxSidePx, quality) : null;
   } catch (err) {
     // Cancelling the camera or picker is not an error.
     if (err instanceof Error && /cancel/i.test(err.message)) return null;
     throw err;
   }
 };
+
+export const pickCampSiteLogo = (): Promise<string | null> => pickImage(256, 0.8);

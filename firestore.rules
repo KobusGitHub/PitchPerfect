@@ -26,6 +26,27 @@ service cloud.firestore {
       allow read, delete: if isOwner();
       allow create: if request.auth != null && isValidSite();
       allow update: if isOwner() && isValidSite();
+
+      // Stands belong to a camp site. Only that camp site's owner can read or change them.
+      match /stands/{standId} {
+        function siteOwnerUid() {
+          return get(/databases/$(database)/documents/campSites/$(siteId)).data.ownerUid;
+        }
+        function isValidStand() {
+          let d = request.resource.data;
+          return d.keys().hasOnly(['standNumber', 'rating', 'shadePercent', 'costPerNight', 'width', 'length', 'notes', 'images'])
+            && d.standNumber is string && d.standNumber.size() > 0 && d.standNumber.size() <= 50
+            && d.rating is number && d.rating >= 0 && d.rating <= 10
+            && (!('shadePercent' in d) || (d.shadePercent is number && d.shadePercent >= 0 && d.shadePercent <= 100))
+            && (!('costPerNight' in d) || (d.costPerNight is number && d.costPerNight >= 0))
+            && (!('width' in d) || (d.width is number && d.width >= 0))
+            && (!('length' in d) || (d.length is number && d.length >= 0))
+            && (!('notes' in d) || (d.notes is string && d.notes.size() <= 2000))
+            && d.images is list && d.images.size() <= 3;
+        }
+        allow read, delete: if request.auth != null && siteOwnerUid() == request.auth.uid;
+        allow create, update: if request.auth != null && siteOwnerUid() == request.auth.uid && isValidStand();
+      }
     }
   }
 }
