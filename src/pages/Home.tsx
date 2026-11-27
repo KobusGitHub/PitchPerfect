@@ -23,6 +23,7 @@ import {
 import { add, checkmarkCircle, flameOutline } from 'ionicons/icons';
 import { useState } from 'react';
 
+import { useAuth } from '../auth/useAuth';
 import {
   addCampSite,
   type CampSite,
@@ -37,7 +38,9 @@ const messageOf = (error: unknown): string =>
   error instanceof Error ? error.message : 'Something went wrong. Please try again.';
 
 const Home: React.FC = () => {
-  const { sites, loading, error: loadError } = useCampSites();
+  const { user } = useAuth();
+  const ownerUid = user?.uid;
+  const { sites, loading, error: loadError } = useCampSites(ownerUid);
   const [selected, setSelected] = useState<CampSite | null>(null);
   const [actionOpen, setActionOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -55,7 +58,8 @@ const Home: React.FC = () => {
       await updateCampSite(formSite.id, input);
       setToast('Camp site updated.');
     } else {
-      await addCampSite(input);
+      if (!ownerUid) throw new Error('You need to be signed in to add a camp site.');
+      await addCampSite(ownerUid, input);
       setToast('Camp site added.');
     }
     setFormOpen(false);

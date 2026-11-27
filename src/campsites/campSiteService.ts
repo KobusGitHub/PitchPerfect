@@ -5,10 +5,10 @@ import {
   deleteField,
   doc,
   onSnapshot,
-  orderBy,
   query,
   type Unsubscribe,
   updateDoc,
+  where,
 } from 'firebase/firestore';
 
 import { db } from '../lib/firebase';
@@ -33,30 +33,33 @@ export interface CampSiteInput {
 const campSitesCollection = collection(db, 'campSites');
 
 export const subscribeToCampSites = (
+  ownerUid: string,
   onChange: (sites: CampSite[]) => void,
   onError: (error: Error) => void,
 ): Unsubscribe =>
   onSnapshot(
-    query(campSitesCollection, orderBy('name')),
+    query(campSitesCollection, where('ownerUid', '==', ownerUid)),
     (snapshot) =>
       onChange(
-        snapshot.docs.map((snap) => {
-          const data = snap.data();
-          return {
-            id: snap.id,
-            name: String(data.name ?? ''),
-            province: String(data.province ?? ''),
-            phone: String(data.phone ?? ''),
-            email: String(data.email ?? ''),
-            logo: typeof data.logo === 'string' ? data.logo : undefined,
-          };
-        }),
+        snapshot.docs
+          .map((snap) => {
+            const data = snap.data();
+            return {
+              id: snap.id,
+              name: String(data.name ?? ''),
+              province: String(data.province ?? ''),
+              phone: String(data.phone ?? ''),
+              email: String(data.email ?? ''),
+              logo: typeof data.logo === 'string' ? data.logo : undefined,
+            };
+          })
+          .sort((a, b) => a.name.localeCompare(b.name)),
       ),
     onError,
   );
 
-export const addCampSite = async (input: CampSiteInput): Promise<void> => {
-  await addDoc(campSitesCollection, input);
+export const addCampSite = async (ownerUid: string, input: CampSiteInput): Promise<void> => {
+  await addDoc(campSitesCollection, { ...input, ownerUid });
 };
 
 export const updateCampSite = async (id: string, input: CampSiteInput): Promise<void> => {
