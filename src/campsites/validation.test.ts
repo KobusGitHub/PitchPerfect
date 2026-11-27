@@ -9,6 +9,10 @@ describe('camp site validation', () => {
     expect(canSaveCampSite(valid)).toBe(true);
   });
 
+  it('accepts a camp site with only a name and province', () => {
+    expect(canSaveCampSite({ name: 'Riverside', province: 'Western Cape', phone: '', email: '' })).toBe(true);
+  });
+
   it('rejects a province outside the list', () => {
     expect(canSaveCampSite({ ...valid, province: 'Atlantis' })).toBe(false);
   });

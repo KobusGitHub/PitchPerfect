@@ -27,5 +27,5 @@ export const isValidEmail = (email: string): boolean => EMAIL_PATTERN.test(email
 export const canSaveCampSite = (values: CampSiteValues): boolean =>
   values.name.trim() !== '' &&
   SOUTH_AFRICAN_PROVINCES.includes(values.province) &&
-  isValidPhone(values.phone.trim()) &&
-  isValidEmail(values.email);
+  (values.phone.trim() === '' || isValidPhone(values.phone.trim())) &&
+  (values.email.trim() === '' || isValidEmail(values.email));
