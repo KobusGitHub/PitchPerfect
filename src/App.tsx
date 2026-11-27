@@ -34,9 +34,11 @@ import '@ionic/react/css/display.css';
  * https://ionicframework.com/docs/theming/dark-mode
  */
 
+/* Dark mode is off: the camping theme in theme/variables.css is light-only, and the system dark
+ * palette turned text white on its cream backgrounds when the phone was in dark mode. */
 /* import '@ionic/react/css/palettes/dark.always.css'; */
 /* import '@ionic/react/css/palettes/dark.class.css'; */
-import '@ionic/react/css/palettes/dark.system.css';
+/* import '@ionic/react/css/palettes/dark.system.css'; */
 
 /* Theme variables */
 import './theme/variables.css';
