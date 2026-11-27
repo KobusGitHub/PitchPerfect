@@ -1,4 +1,5 @@
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Capacitor } from '@capacitor/core';
 
 const MAX_SIDE_PX = 256;
 const JPEG_QUALITY = 0.8;
@@ -26,15 +27,42 @@ export const resizeToDataUrl = (dataUrl: string): Promise<string> =>
     image.src = dataUrl;
   });
 
+// Opens the browser's file chooser directly. Must be called from a click handler.
+const pickFileOnWeb = (): Promise<string | null> =>
+  new Promise((resolve, reject) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) {
+        resolve(null);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(new Error('Could not read that file.'));
+      reader.readAsDataURL(file);
+    };
+    input.oncancel = () => resolve(null);
+    input.click();
+  });
+
+const pickOnDevice = async (): Promise<string | null> => {
+  // The native prompt offers Take Photo or Choose from gallery.
+  const photo = await Camera.getPhoto({
+    source: CameraSource.Prompt,
+    resultType: CameraResultType.DataUrl,
+    quality: 90,
+    correctOrientation: true,
+  });
+  return photo.dataUrl ?? null;
+};
+
 export const pickCampSiteLogo = async (): Promise<string | null> => {
   try {
-    const photo = await Camera.getPhoto({
-      source: CameraSource.Prompt,
-      resultType: CameraResultType.DataUrl,
-      quality: 90,
-      correctOrientation: true,
-    });
-    return photo.dataUrl ? await resizeToDataUrl(photo.dataUrl) : null;
+    const dataUrl = Capacitor.getPlatform() === 'web' ? await pickFileOnWeb() : await pickOnDevice();
+    return dataUrl ? await resizeToDataUrl(dataUrl) : null;
   } catch (err) {
     // Cancelling the camera or picker is not an error.
     if (err instanceof Error && /cancel/i.test(err.message)) return null;
