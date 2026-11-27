@@ -15,12 +15,11 @@ import {
   IonModal,
   IonPage,
   IonSpinner,
-  IonThumbnail,
   IonTitle,
   IonToast,
   IonToolbar,
 } from '@ionic/react';
-import { add, checkmarkCircle } from 'ionicons/icons';
+import { add, checkmarkCircle, closeCircle } from 'ionicons/icons';
 import { useState } from 'react';
 
 import { useAuth } from '../auth/useAuth';
@@ -85,11 +84,16 @@ const Home: React.FC = () => {
           <IonTitle>Home</IonTitle>
           <IonButtons slot="end">
             <IonIcon
-              icon={checkmarkCircle}
-              color="primary"
-              title="Your campsite log is up to date"
-              aria-label="Your campsite log is up to date"
-              style={{ fontSize: 24, marginInlineEnd: 12 }}
+              icon={loadError ? closeCircle : checkmarkCircle}
+              title={loadError ? 'Your campsite log could not be loaded' : 'Your campsite log is up to date'}
+              aria-label={loadError ? 'Your campsite log could not be loaded' : 'Your campsite log is up to date'}
+              style={{
+                fontSize: 24,
+                marginInlineEnd: 12,
+                background: '#ffffff',
+                borderRadius: '50%',
+                color: loadError ? '#c62828' : '#2e7d32',
+              }}
             />
           </IonButtons>
         </IonToolbar>
@@ -124,12 +128,14 @@ const Home: React.FC = () => {
                 setActionOpen(true);
               }}
             >
-              {site.logo && (
-                <IonThumbnail slot="start">
-                  <img src={site.logo} alt="" style={{ objectFit: 'contain' }} />
-                </IonThumbnail>
-              )}
               <IonLabel>
+                {site.logo && (
+                  <img
+                    src={site.logo}
+                    alt=""
+                    style={{ display: 'block', width: '100%', height: 'auto', borderRadius: 12, marginBottom: 8 }}
+                  />
+                )}
                 <h2>{site.name}</h2>
                 <p>{site.province}</p>
                 <p>{site.phone}</p>
