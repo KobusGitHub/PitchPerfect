@@ -129,8 +129,10 @@ console.log(`Installing ${flavour.task} on ${serial}.`);
 const build = spawnSync('npm', ['run', flavour.script], { stdio: 'inherit', shell: true, env });
 if (build.status !== 0) process.exit(build.status ?? 1);
 
-const install = spawnSync(isWindows ? 'gradlew.bat' : './gradlew', [flavour.task], {
-  cwd: join(process.cwd(), 'android'),
+// Full path: cmd.exe does not always search the working directory (NoDefaultCurrentDirectoryInExePath).
+const androidDir = join(process.cwd(), 'android');
+const install = spawnSync(`"${join(androidDir, isWindows ? 'gradlew.bat' : 'gradlew')}"`, [flavour.task], {
+  cwd: androidDir,
   stdio: 'inherit',
   shell: true,
   env,
