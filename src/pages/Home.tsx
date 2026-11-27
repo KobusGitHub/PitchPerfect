@@ -126,7 +126,7 @@ const Home: React.FC = () => {
             >
               {site.logo && (
                 <IonThumbnail slot="start">
-                  <img src={site.logo} alt="" />
+                  <img src={site.logo} alt="" style={{ objectFit: 'contain' }} />
                 </IonThumbnail>
               )}
               <IonLabel>

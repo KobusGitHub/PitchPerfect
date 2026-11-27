@@ -91,7 +91,7 @@ const CampSiteForm: React.FC<CampSiteFormProps> = ({ site, onSave, onCancel }) =
                 <img
                   src={logo}
                   alt="Camp site logo"
-                  style={{ width: 96, height: 96, objectFit: 'cover', borderRadius: 12 }}
+                  style={{ width: 96, height: 96, objectFit: 'contain', borderRadius: 12 }}
                 />
               ) : (
                 <div style={{ color: '#7a6a58' }}>No logo yet</div>
