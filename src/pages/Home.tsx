@@ -133,7 +133,15 @@ const Home: React.FC = () => {
                   <img
                     src={site.logo}
                     alt=""
-                    style={{ display: 'block', width: '100%', height: 'auto', borderRadius: 12, marginBottom: 8 }}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      height: 'auto',
+                      maxHeight: 150,
+                      objectFit: 'contain',
+                      borderRadius: 12,
+                      marginBottom: 8,
+                    }}
                   />
                 )}
                 <h2>{site.name}</h2>
