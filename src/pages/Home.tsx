@@ -10,10 +10,10 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonListHeader,
   IonMenuButton,
   IonModal,
   IonPage,
+  IonSearchbar,
   IonSpinner,
   IonTitle,
   IonToast,
@@ -31,17 +31,24 @@ import {
   deleteCampSite,
   updateCampSite,
 } from '../campsites/campSiteService';
+import { coordinatesQuery, mailHref, mapsHref, telHref } from '../campsites/links';
+import { filterCampSites } from '../campsites/search';
 import { useCampSites } from '../campsites/useCampSites';
 import CampSiteForm from '../components/CampSiteForm';
 
 const messageOf = (error: unknown): string =>
   error instanceof Error ? error.message : 'Something went wrong. Please try again.';
 
+// Links inside a row must not also open the Edit/Delete action sheet.
+const stopRowClick = (event: React.MouseEvent) => event.stopPropagation();
+
 const Home: React.FC = () => {
   const { user } = useAuth();
   const router = useIonRouter();
   const ownerUid = user?.uid;
   const { sites, loading, error: loadError } = useCampSites(ownerUid);
+  const [query, setQuery] = useState('');
+  const visibleSites = filterCampSites(sites, query);
   const [selected, setSelected] = useState<CampSite | null>(null);
   const [actionOpen, setActionOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -83,7 +90,7 @@ const Home: React.FC = () => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Home</IonTitle>
+          <IonTitle>Camp Sites</IonTitle>
           <IonButtons slot="end">
             <IonIcon
               icon={loadError ? closeCircle : checkmarkCircle}
@@ -103,9 +110,15 @@ const Home: React.FC = () => {
       <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Home</IonTitle>
+            <IonTitle size="large">Camp Sites</IonTitle>
           </IonToolbar>
         </IonHeader>
+        <IonSearchbar
+          placeholder="Search by name or province"
+          value={query}
+          onIonInput={(e) => setQuery(e.detail.value ?? '')}
+          debounce={150}
+        />
         {loading && (
           <div className="ion-text-center ion-padding">
             <IonSpinner />
@@ -115,41 +128,82 @@ const Home: React.FC = () => {
         {!loading && !loadError && sites.length === 0 && (
           <div className="ion-padding ion-text-center">No camp sites yet. Tap + to add one.</div>
         )}
+        {!loading && !loadError && sites.length > 0 && visibleSites.length === 0 && (
+          <div className="ion-padding ion-text-center">No camp sites match your search.</div>
+        )}
         <IonList className="crew-list" lines="none">
-          <IonListHeader>
-            <IonLabel>Camp Sites</IonLabel>
-          </IonListHeader>
-          {sites.map((site) => (
-            <IonItem
-              key={site.id}
-              className="crew-card"
-              button
-              detail={false}
-              onClick={() => {
-                setSelected(site);
-                setActionOpen(true);
-              }}
-            >
+          {visibleSites.map((site) => (
+            <IonItem key={site.id} className="crew-card" detail={false}>
               <IonLabel>
-                {site.logo && (
-                  <img
-                    src={site.logo}
-                    alt=""
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      height: 'auto',
-                      maxHeight: 150,
-                      objectFit: 'contain',
-                      borderRadius: 12,
-                      marginBottom: 8,
-                    }}
-                  />
-                )}
-                <h2>{site.name}</h2>
-                <p>{site.province}</p>
-                <p>{site.phone}</p>
-                <p>{site.email}</p>
+                <div
+                  className="site-summary"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    setSelected(site);
+                    setActionOpen(true);
+                  }}
+                >
+                  {site.logo && (
+                    <img
+                      src={site.logo}
+                      alt=""
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        height: 'auto',
+                        maxHeight: 150,
+                        objectFit: 'contain',
+                        borderRadius: 12,
+                        marginBottom: 8,
+                      }}
+                    />
+                  )}
+                  <h2>{site.name}</h2>
+                  <p>{site.province}</p>
+                </div>
+                <div className="site-links">
+                  {site.phone && (
+                    <p>
+                      <a className="site-link" href={telHref(site.phone)} onClick={stopRowClick}>
+                        {site.phone}
+                      </a>
+                    </p>
+                  )}
+                  {site.email && (
+                    <p>
+                      <a className="site-link" href={mailHref(site.email)} onClick={stopRowClick}>
+                        {site.email}
+                      </a>
+                    </p>
+                  )}
+                  {site.address && (
+                    <p>
+                      <a
+                        className="site-link"
+                        href={mapsHref(site.address)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={stopRowClick}
+                      >
+                        {site.address}
+                      </a>
+                    </p>
+                  )}
+                  {site.latitude !== undefined && site.longitude !== undefined && (
+                    <p>
+                      <a
+                        className="site-link"
+                        href={mapsHref(coordinatesQuery(site.latitude, site.longitude))}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={stopRowClick}
+                      >
+                        {site.latitude}, {site.longitude}
+                      </a>
+                    </p>
+                  )}
+                </div>
               </IonLabel>
             </IonItem>
           ))}
@@ -164,6 +218,7 @@ const Home: React.FC = () => {
         <IonActionSheet
           isOpen={actionOpen}
           header={selected?.name}
+          cssClass="camp-action-sheet"
           onDidDismiss={(e) => {
             setActionOpen(false);
             const action = (e.detail.data as { action?: string } | undefined)?.action;
@@ -175,9 +230,9 @@ const Home: React.FC = () => {
             if (action === 'delete') setDeleteOpen(true);
           }}
           buttons={[
-            { text: 'Stands', data: { action: 'stands' } },
             { text: 'Edit', data: { action: 'edit' } },
             { text: 'Delete', role: 'destructive', data: { action: 'delete' } },
+            { text: 'Stands', data: { action: 'stands' } },
             { text: 'Cancel', role: 'cancel' },
           ]}
         />

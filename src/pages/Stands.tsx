@@ -3,16 +3,14 @@ import {
   IonAlert,
   IonBackButton,
   IonButtons,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
   IonContent,
   IonFab,
   IonFabButton,
   IonHeader,
   IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
   IonModal,
   IonPage,
   IonSpinner,
@@ -100,22 +98,19 @@ const Stands: React.FC = () => {
         {!loading && !loadError && stands.length === 0 && (
           <div className="ion-padding ion-text-center">No stands yet. Tap + to add one.</div>
         )}
-        <div className="crew-list">
+        <IonList className="crew-list" lines="none">
           {stands.map((stand) => (
-            <IonCard
+            <IonItem
               key={stand.id}
-              className="camp-card"
+              className="crew-card"
               button
+              detail={false}
               onClick={() => {
                 setSelected(stand);
                 setActionOpen(true);
               }}
             >
-              <IonCardHeader>
-                <IonCardTitle>Stand {stand.standNumber}</IonCardTitle>
-                <IonCardSubtitle>My rating: {stand.rating}/10</IonCardSubtitle>
-              </IonCardHeader>
-              <IonCardContent>
+              <IonLabel>
                 {stand.images.map((src, index) => (
                   <img
                     key={index}
@@ -132,14 +127,16 @@ const Stands: React.FC = () => {
                     }}
                   />
                 ))}
+                <h2>Stand {stand.standNumber}</h2>
+                <p>My rating: {stand.rating}/10</p>
                 {stand.shadePercent !== undefined && <p>Shade: {stand.shadePercent}%</p>}
                 {stand.costPerNight !== undefined && <p>Cost per night: R {stand.costPerNight}</p>}
                 {formatSize(stand.width, stand.length) && <p>Size: {formatSize(stand.width, stand.length)}</p>}
                 {stand.notes && <p style={{ whiteSpace: 'pre-line' }}>{stand.notes}</p>}
-              </IonCardContent>
-            </IonCard>
+              </IonLabel>
+            </IonItem>
           ))}
-        </div>
+        </IonList>
 
         <IonFab slot="fixed" vertical="bottom" horizontal="end">
           <IonFabButton aria-label="Add stand" color="secondary" onClick={openAdd}>
@@ -150,6 +147,7 @@ const Stands: React.FC = () => {
         <IonActionSheet
           isOpen={actionOpen}
           header={selected ? `Stand ${selected.standNumber}` : undefined}
+          cssClass="camp-action-sheet"
           onDidDismiss={(e) => {
             setActionOpen(false);
             const action = (e.detail.data as { action?: string } | undefined)?.action;

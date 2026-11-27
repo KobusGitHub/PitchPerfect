@@ -14,14 +14,17 @@ service cloud.firestore {
         return request.auth != null && resource.data.ownerUid == request.auth.uid;
       }
       function isValidSite() {
-        return request.resource.data.keys().hasOnly(['name', 'province', 'phone', 'email', 'logo', 'ownerUid'])
+        return request.resource.data.keys().hasOnly(['name', 'province', 'phone', 'email', 'address', 'latitude', 'longitude', 'logo', 'ownerUid'])
           && request.resource.data.ownerUid == request.auth.uid
           && request.resource.data.name is string && request.resource.data.name.size() > 0
           && request.resource.data.province is string && request.resource.data.province.size() > 0
           && request.resource.data.phone is string
           && request.resource.data.email is string
+          && (!('address' in request.resource.data) || (request.resource.data.address is string && request.resource.data.address.size() <= 300))
+          && (!('latitude' in request.resource.data) || (request.resource.data.latitude is number && request.resource.data.latitude >= -90 && request.resource.data.latitude <= 90))
+          && (!('longitude' in request.resource.data) || (request.resource.data.longitude is number && request.resource.data.longitude >= -180 && request.resource.data.longitude <= 180))
           && (!('logo' in request.resource.data)
-            || (request.resource.data.logo is string && request.resource.data.logo.size() < 500000));
+            || (request.resource.data.logo is string && request.resource.data.logo.size() < 700000));
       }
       allow read, delete: if isOwner();
       allow create: if request.auth != null && isValidSite();

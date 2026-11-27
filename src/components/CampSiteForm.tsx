@@ -14,15 +14,21 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import { arrowBack, camera, trashOutline } from 'ionicons/icons';
+import { arrowBack, camera, locate, trashOutline } from 'ionicons/icons';
 import { useState } from 'react';
 
 import { type CampSite, type CampSiteInput } from '../campsites/campSiteService';
+import { getCurrentCoordinates } from '../campsites/location';
 import { pickCampSiteLogo } from '../campsites/logo';
 import { canSaveCampSite, SOUTH_AFRICAN_PROVINCES } from '../campsites/validation';
 
 const messageOf = (error: unknown): string =>
   error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+
+// Keeps the coordinate short enough to read and type, about 0.1 m.
+const roundCoordinate = (value: number): string => String(Number(value.toFixed(6)));
+
+const optionalNumber = (value: string): number | undefined => (value.trim() === '' ? undefined : Number(value));
 
 interface CampSiteFormProps {
   site?: CampSite;
@@ -36,11 +42,15 @@ const CampSiteForm: React.FC<CampSiteFormProps> = ({ site, onSave, onCancel }) =
   const [province, setProvince] = useState(site?.province ?? '');
   const [phone, setPhone] = useState(site?.phone ?? '');
   const [email, setEmail] = useState(site?.email ?? '');
+  const [address, setAddress] = useState(site?.address ?? '');
+  const [latitude, setLatitude] = useState(site?.latitude === undefined ? '' : String(site.latitude));
+  const [longitude, setLongitude] = useState(site?.longitude === undefined ? '' : String(site.longitude));
   const [logo, setLogo] = useState<string | undefined>(site?.logo);
   const [saving, setSaving] = useState(false);
+  const [locating, setLocating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const values = { name, province, phone, email };
+  const values = { name, province, phone, email, latitude, longitude };
   const valid = canSaveCampSite(values);
 
   const chooseLogo = async () => {
@@ -53,6 +63,20 @@ const CampSiteForm: React.FC<CampSiteFormProps> = ({ site, onSave, onCancel }) =
     }
   };
 
+  const fillFromGps = async () => {
+    setError(null);
+    setLocating(true);
+    try {
+      const coordinates = await getCurrentCoordinates();
+      setLatitude(roundCoordinate(coordinates.latitude));
+      setLongitude(roundCoordinate(coordinates.longitude));
+    } catch (err) {
+      setError(messageOf(err));
+    } finally {
+      setLocating(false);
+    }
+  };
+
   const submit = async () => {
     setSaving(true);
     setError(null);
@@ -62,6 +86,9 @@ const CampSiteForm: React.FC<CampSiteFormProps> = ({ site, onSave, onCancel }) =
         province,
         phone: phone.trim(),
         email: email.trim(),
+        address: address.trim(),
+        latitude: optionalNumber(latitude),
+        longitude: optionalNumber(longitude),
         ...(logo ? { logo } : {}),
       });
     } catch (err) {
@@ -149,6 +176,40 @@ const CampSiteForm: React.FC<CampSiteFormProps> = ({ site, onSave, onCancel }) =
                 onIonInput={(e) => setEmail(e.detail.value ?? '')}
               />
             </IonItem>
+            <IonItem>
+              <IonInput
+                label="Address"
+                labelPlacement="stacked"
+                value={address}
+                onIonInput={(e) => setAddress(e.detail.value ?? '')}
+              />
+            </IonItem>
+            <IonItem>
+              <IonInput
+                label="Latitude"
+                labelPlacement="stacked"
+                type="number"
+                inputmode="decimal"
+                value={latitude}
+                onIonInput={(e) => setLatitude(e.detail.value ?? '')}
+              />
+            </IonItem>
+            <IonItem>
+              <IonInput
+                label="Longitude"
+                labelPlacement="stacked"
+                type="number"
+                inputmode="decimal"
+                value={longitude}
+                onIonInput={(e) => setLongitude(e.detail.value ?? '')}
+              />
+            </IonItem>
+            <div className="ion-padding">
+              <IonButton expand="block" fill="outline" disabled={locating} onClick={() => void fillFromGps()}>
+                <IonIcon slot="start" icon={locate} />
+                {locating ? 'Getting location...' : 'Use current location'}
+              </IonButton>
+            </div>
             {error && (
               <div className="ion-padding">
                 <IonNote color="danger">{error}</IonNote>

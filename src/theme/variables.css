@@ -175,6 +175,130 @@ ion-list.crew-list {
   overflow: hidden;
 }
 
+ion-menu.pp-side-menu {
+  --background: #fffdf8;
+}
+
+ion-header.side-menu-header {
+  box-shadow: none;
+  background: linear-gradient(160deg, #2f5d3a 0%, #3f7a4d 100%);
+}
+
+.side-menu-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 28px 16px 20px;
+  color: #ffffff;
+}
+
+.site-link {
+  color: var(--ion-color-primary, #2e5e3e);
+  text-decoration: underline;
+  word-break: break-word;
+}
+
+.site-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.site-links > p {
+  margin: 0;
+}
+
+.site-links a {
+  display: block;
+  padding: 8px 0;
+  min-height: 36px;
+}
+
+.side-menu-brand h2 {
+  margin: 12px 0 4px;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.side-menu-brand p {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+  word-break: break-all;
+}
+
+ion-list.side-menu-list {
+  background: transparent;
+  padding: 12px 8px;
+}
+
+ion-item.side-menu-item {
+  --background: transparent;
+  --color: #3b2f25;
+  --border-radius: 12px;
+  --padding-start: 12px;
+  --min-height: 52px;
+  margin: 4px 0;
+  font-weight: 600;
+}
+
+ion-item.side-menu-item ion-icon {
+  color: #2f5d3a;
+  font-size: 22px;
+  margin-inline-end: 14px;
+}
+
+ion-item.side-menu-item-active {
+  --background: #e4ecd9;
+  --color: #2f5d3a;
+}
+
+.camp-action-sheet {
+  --background: #fffdf8;
+  --button-background: #fffdf8;
+  --button-background-activated: #f1e8d6;
+  --button-background-hover: #f1e8d6;
+  --button-color: #2f5d3a;
+  --button-color-hover: #2f5d3a;
+  --color: #3b2f25;
+  --backdrop-opacity: 0.45;
+  --max-width: 420px;
+  font-family: inherit;
+}
+
+.camp-action-sheet .action-sheet-title {
+  color: #3b2f25;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.camp-action-sheet .action-sheet-group {
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(59, 47, 37, 0.15);
+  border: 1px solid #e4d9c6;
+  overflow: hidden;
+}
+
+.camp-action-sheet .action-sheet-button {
+  font-size: 1.05rem;
+  min-height: 56px;
+  font-weight: 600;
+}
+
+.camp-action-sheet .action-sheet-button.action-sheet-destructive,
+.camp-action-sheet .action-sheet-destructive {
+  --button-color: #c62828;
+  color: #c62828;
+}
+
+.camp-action-sheet .action-sheet-cancel {
+  --button-color: #3b2f25;
+  color: #3b2f25;
+  font-weight: 700;
+}
+
 ion-item.crew-card {
   --background: #fffdf8;
   --padding-start: 16px;

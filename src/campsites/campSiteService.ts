@@ -19,6 +19,9 @@ export interface CampSite {
   province: string;
   phone: string;
   email: string;
+  address: string;
+  latitude?: number;
+  longitude?: number;
   logo?: string;
 }
 
@@ -27,6 +30,9 @@ export interface CampSiteInput {
   province: string;
   phone: string;
   email: string;
+  address: string;
+  latitude?: number;
+  longitude?: number;
   logo?: string;
 }
 
@@ -50,6 +56,9 @@ export const subscribeToCampSites = (
               province: String(data.province ?? ''),
               phone: String(data.phone ?? ''),
               email: String(data.email ?? ''),
+              address: String(data.address ?? ''),
+              latitude: typeof data.latitude === 'number' ? data.latitude : undefined,
+              longitude: typeof data.longitude === 'number' ? data.longitude : undefined,
               logo: typeof data.logo === 'string' ? data.logo : undefined,
             };
           })
@@ -59,12 +68,19 @@ export const subscribeToCampSites = (
   );
 
 export const addCampSite = async (ownerUid: string, input: CampSiteInput): Promise<void> => {
-  await addDoc(campSitesCollection, { ...input, ownerUid });
+  // Firestore rejects undefined values, so optional fields that are not set are left out.
+  const data = Object.fromEntries(Object.entries(input).filter(([, value]) => value !== undefined));
+  await addDoc(campSitesCollection, { ...data, ownerUid });
 };
 
 export const updateCampSite = async (id: string, input: CampSiteInput): Promise<void> => {
-  // Clearing the logo must remove the field, not store undefined.
-  await updateDoc(doc(db, 'campSites', id), { ...input, logo: input.logo ?? deleteField() });
+  // Clearing an optional field must remove it, not store undefined.
+  await updateDoc(doc(db, 'campSites', id), {
+    ...input,
+    logo: input.logo ?? deleteField(),
+    latitude: input.latitude ?? deleteField(),
+    longitude: input.longitude ?? deleteField(),
+  });
 };
 
 export const deleteCampSite = async (id: string): Promise<void> => {

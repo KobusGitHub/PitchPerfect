@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import { canSaveCampSite, isValidEmail, isValidPhone } from '../campsites/validation';
 
-const valid = { name: 'Riverside', province: 'Western Cape', phone: '+27 21 555 0100', email: 'site@example.com' };
+const valid = {
+  name: 'Riverside',
+  province: 'Western Cape',
+  phone: '+27 21 555 0100',
+  email: 'site@example.com',
+  latitude: '',
+  longitude: '',
+};
 
 describe('camp site validation', () => {
   it('accepts a complete camp site', () => {
@@ -10,7 +17,7 @@ describe('camp site validation', () => {
   });
 
   it('accepts a camp site with only a name and province', () => {
-    expect(canSaveCampSite({ name: 'Riverside', province: 'Western Cape', phone: '', email: '' })).toBe(true);
+    expect(canSaveCampSite({ ...valid, phone: '', email: '' })).toBe(true);
   });
 
   it('rejects a province outside the list', () => {
@@ -25,5 +32,12 @@ describe('camp site validation', () => {
   it('rejects an email without a domain', () => {
     expect(isValidEmail('site@example')).toBe(false);
     expect(canSaveCampSite({ ...valid, email: 'site@example' })).toBe(false);
+  });
+
+  it('accepts optional coordinates within range and rejects out-of-range values', () => {
+    expect(canSaveCampSite({ ...valid, latitude: '-33.9249', longitude: '18.4241' })).toBe(true);
+    expect(canSaveCampSite({ ...valid, latitude: '91', longitude: '18' })).toBe(false);
+    expect(canSaveCampSite({ ...valid, latitude: '-33', longitude: '181' })).toBe(false);
+    expect(canSaveCampSite({ ...valid, latitude: 'abc', longitude: '' })).toBe(false);
   });
 });
