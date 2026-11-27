@@ -2,6 +2,7 @@ import {
   addDoc,
   collection,
   deleteDoc,
+  deleteField,
   doc,
   onSnapshot,
   orderBy,
@@ -18,6 +19,7 @@ export interface CampSite {
   province: string;
   phone: string;
   email: string;
+  logo?: string;
 }
 
 export interface CampSiteInput {
@@ -25,6 +27,7 @@ export interface CampSiteInput {
   province: string;
   phone: string;
   email: string;
+  logo?: string;
 }
 
 const campSitesCollection = collection(db, 'campSites');
@@ -45,6 +48,7 @@ export const subscribeToCampSites = (
             province: String(data.province ?? ''),
             phone: String(data.phone ?? ''),
             email: String(data.email ?? ''),
+            logo: typeof data.logo === 'string' ? data.logo : undefined,
           };
         }),
       ),
@@ -56,7 +60,8 @@ export const addCampSite = async (input: CampSiteInput): Promise<void> => {
 };
 
 export const updateCampSite = async (id: string, input: CampSiteInput): Promise<void> => {
-  await updateDoc(doc(db, 'campSites', id), { ...input });
+  // Clearing the logo must remove the field, not store undefined.
+  await updateDoc(doc(db, 'campSites', id), { ...input, logo: input.logo ?? deleteField() });
 };
 
 export const deleteCampSite = async (id: string): Promise<void> => {

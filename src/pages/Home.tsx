@@ -15,6 +15,7 @@ import {
   IonModal,
   IonPage,
   IonSpinner,
+  IonThumbnail,
   IonTitle,
   IonToast,
   IonToolbar,
@@ -129,6 +130,11 @@ const Home: React.FC = () => {
                 setActionOpen(true);
               }}
             >
+              {site.logo && (
+                <IonThumbnail slot="start">
+                  <img src={site.logo} alt="" />
+                </IonThumbnail>
+              )}
               <IonLabel>
                 <h2>{site.name}</h2>
                 <p>{site.province}</p>
