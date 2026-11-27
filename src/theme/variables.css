@@ -72,6 +72,46 @@ ion-toolbar.side-menu-footer::part(background) {
   box-shadow: none;
 }
 
+ion-header ion-toolbar {
+  position: relative;
+  overflow: hidden;
+}
+
+ion-header ion-toolbar ion-title,
+ion-header ion-toolbar ion-buttons {
+  position: relative;
+  z-index: 1;
+}
+
+ion-header ion-toolbar::after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  left: 0;
+  width: 120px;
+  height: 50%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 56'%3E%3Cg transform='matrix(-1 0 0 1 240 0)'%3E%3Cg fill='%23F7F2E7' fill-opacity='0.16'%3E%3Cpath d='M18 44V32q0-4 4-5l18-2 12-11h36q4 0 5 4l1 8h34v18z'/%3E%3Crect x='98' y='19' width='14' height='7' rx='1'/%3E%3Crect x='114' y='17' width='8' height='9' rx='1'/%3E%3Crect x='128' y='40' width='18' height='2'/%3E%3Crect x='144' y='12' width='88' height='32' rx='12'/%3E%3Crect x='160' y='8' width='10' height='4' rx='1'/%3E%3Crect x='200' y='8' width='10' height='4' rx='1'/%3E%3Ccircle cx='38' cy='44' r='8'/%3E%3Ccircle cx='110' cy='44' r='8'/%3E%3Ccircle cx='194' cy='44' r='8'/%3E%3C/g%3E%3Cg fill='%232F5D3A'%3E%3Cpath d='M56 25l4-7h10v7z'/%3E%3Cpath d='M73 18h11q2 0 3 5l1 2H73z'/%3E%3Crect x='160' y='18' width='12' height='22' rx='2'/%3E%3Crect x='180' y='20' width='30' height='11' rx='3'/%3E%3Crect x='144' y='33' width='88' height='3'/%3E%3Ccircle cx='38' cy='44' r='3'/%3E%3Ccircle cx='110' cy='44' r='3'/%3E%3Ccircle cx='194' cy='44' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")
+    no-repeat center / 100% 100%;
+  pointer-events: none;
+  z-index: 0;
+  animation: truck-drive 12s linear infinite;
+}
+
+@keyframes truck-drive {
+  from {
+    transform: translateX(-120px);
+  }
+  to {
+    transform: translateX(100vw);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ion-header ion-toolbar::after {
+    display: none;
+  }
+}
+
 ion-title {
   font-family: 'Roboto Slab', Georgia, serif;
   font-weight: 700;
