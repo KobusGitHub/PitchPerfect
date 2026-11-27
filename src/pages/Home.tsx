@@ -20,7 +20,7 @@ import {
   IonToast,
   IonToolbar,
 } from '@ionic/react';
-import { add, checkmarkCircle, flameOutline } from 'ionicons/icons';
+import { add, checkmarkCircle } from 'ionicons/icons';
 import { useState } from 'react';
 
 import { useAuth } from '../auth/useAuth';
@@ -83,6 +83,15 @@ const Home: React.FC = () => {
             <IonMenuButton />
           </IonButtons>
           <IonTitle>Home</IonTitle>
+          <IonButtons slot="end">
+            <IonIcon
+              icon={checkmarkCircle}
+              color="primary"
+              title="Your campsite log is up to date"
+              aria-label="Your campsite log is up to date"
+              style={{ fontSize: 24, marginInlineEnd: 12 }}
+            />
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
@@ -91,25 +100,6 @@ const Home: React.FC = () => {
             <IonTitle size="large">Home</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <div className="ion-padding">
-          <div className="camp-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <strong style={{ fontSize: '1.1rem' }}>Welcome back</strong>
-              <p style={{ margin: '2px 0 0', color: '#7a6a58' }}>Your campsite log is up to date</p>
-            </div>
-            <IonIcon icon={checkmarkCircle} color="primary" style={{ fontSize: 28 }} aria-hidden="true" />
-          </div>
-          <div className="camp-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div>
-              <strong style={{ fontSize: '1.1rem' }}>Pitches Logged</strong>
-              <p style={{ margin: '2px 0 0', color: '#7a6a58' }}>Plan your next pitch by preference</p>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <strong style={{ fontSize: '1.6rem', color: '#2f5d3a' }}>0</strong>
-              <IonIcon icon={flameOutline} color="secondary" aria-hidden="true" />
-            </div>
-          </div>
-        </div>
         {loading && (
           <div className="ion-text-center ion-padding">
             <IonSpinner />
